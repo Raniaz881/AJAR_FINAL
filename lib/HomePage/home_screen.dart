@@ -80,7 +80,7 @@ class _HomeScreenState extends State<HomeScreen> {
             CustomListTile(Icons.person,'Profile',()=>{}),
 
             CustomListTile(Icons.home,'My Properties',()=>{}),
-            CustomListTile(Icons.person_add,'Requests',()=>{Navigator.push(context, MaterialPageRoute(builder: (context)=> TemplatePage()))}),
+            CustomListTile(Icons.person_add,'Requests',()=>{Navigator.push(context, MaterialPageRoute(builder: (context)=> Listrequest()))}),
             CustomListTile(Icons.library_books,'Contracts',()=>{Navigator.push(context, MaterialPageRoute(builder: (context)=> TemplatePage()))}),
             SizedBox(height: 70),
 
