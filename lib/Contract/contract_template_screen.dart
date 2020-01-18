@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_app/Contract/residential_contract.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:pdftron_flutter/pdftron_flutter.dart';
 
@@ -12,7 +11,6 @@ class _TemplatePageState extends State<TemplatePage> {
   String _Rcontract = "https://data2.unhcr.org/fr/documents/download/44320";
   String _Rcontract2 =
       "https://jordan-lawyer.com/wp-content/uploads/2018/10/%D9%86%D9%85%D9%88%D8%B0%D8%AC-%D8%B9%D9%82%D8%AF-%D8%A7%D9%8A%D8%AC%D8%A7%D8%B1-%D8%B4%D9%82%D8%A9-%D8%A8%D9%8A%D8%AA-%D9%88%D9%81%D9%82%D8%A7-%D9%84%D8%A3%D8%AD%D8%AF%D8%AB-%D8%A7%D9%84%D8%AA%D8%B9%D8%AF%D9%8A%D9%84%D8%A7%D8%AA-2018-%D9%88-2019.pdf";
-
   String _Scontract = "https://www.almaal.org/wp-content/uploads/2019/10/%D9%86%D9%85%D9%88%D8%B0%D8%AC_%D8%B9%D9%82%D8%AF_%D8%A7%D9%8A%D8%AC%D8%A7%D8%B1_%D9%85%D8%AD%D9%84.pdf";
   String _Scontract2 = '‪file:///C:/Users/HP/Downloads/%D8%B9%D9%82%D8%AF-%D8%A5%D9%8A%D8%AC%D8%A7%D8%B1-%D8%B4%D9%82%D8%A9-%D8%B3%D9%83%D9%86%D9%8A%D8%A9.htm';
   String _Scontract3 = "http://www.alexcham.org/Media/Files/%D8%B9%D9%82%D8%AF%20%D8%A5%D9%8A%D8%AC%D8%A7%D8%B1%20%D9%85%D8%AD%D9%84%20%D8%AA%D8%AC%D8%A7%D8%B1%D9%89%20%D8%A8%D9%83%D8%A7%D9%85%D9%84.pdf";

@@ -1,6 +1,8 @@
+import 'package:flutter_app/main.dart';
 import 'package:flutter_app/services/user.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/services/Sign_in.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'auth.dart';
 import 'database.dart';
 
@@ -211,6 +213,8 @@ class _RegisterState extends State<Register> {
                            lastName: lastNameController.text,
                            phoneNumber: phoneController.text,
                          );
+                          await fatehPreferences.setString('myUID', result.uid);
+                         await fatehPreferences.setString('nickname', firstNameController.text);
                          print('Updated User Data Successfully');
                          _showSuccessDialog();
                         }else {

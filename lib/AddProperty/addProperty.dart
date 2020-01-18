@@ -1,20 +1,15 @@
 import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+
 import 'MyProperties.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_app/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:image_picker/image_picker.dart';
-
-class User {
-  final String name, address, date;
-
-  const User({
-    this.name,
-    this.address,
-    this.date,
-  });
-}
 
 class AddProperty extends StatelessWidget {
   @override
@@ -34,18 +29,29 @@ class PropertyAdv extends StatefulWidget {
     return _PropertyAdvState();
   }
 }
-var _nameController = new TextEditingController();
-var _addressController = new TextEditingController();
-var _dateController = new TextEditingController();
 
 class _PropertyAdvState extends State<PropertyAdv> {
+  var _nameController = TextEditingController();
+  var priceController = TextEditingController();
+  var _viewController = TextEditingController();
+  var _numberOfBedroom = TextEditingController();
+  var _numberOfBathRooms = TextEditingController();
+  var _size = TextEditingController();
+  var _specialrooms = TextEditingController();
+  var _garagerooms = TextEditingController();
+  var _description = TextEditingController();
+  var _address = TextEditingController();
   List<Object> images = List<Object>();
-  Future<File> _imageFile;
+  List<File> _listOFImages = <File>[];
+  List<String> _listOFImagesUrl = <String>[];
+  File _imageFile;
+  bool isUploading = false;
 
   void initState() {
     // TODO: implement initState
     super.initState();
     setState(() {
+      isUploading = false;
       images.add("Add Image");
       images.add("Add Image");
       images.add("Add Image");
@@ -55,233 +61,215 @@ class _PropertyAdvState extends State<PropertyAdv> {
       images.add("Add Image");
       images.add("Add Image");
       images.add("Add Image");
-
-
     });
   }
-
+  Widget buildLoading() {
+    return Positioned(
+      child: isUploading
+          ? Container(
+        child: Center(
+          child: CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.greenAccent)),
+        ),
+        color: Colors.white.withOpacity(0.8),
+      )
+          : Container(),
+    );
+  }
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Color(0xFF607D8B),
-      body: ListView(children: <Widget>[
-        Padding(
-            padding: EdgeInsets.symmetric(vertical: 20.0),
-            child: Column(children: <Widget>[
-              Container(
-                alignment: Alignment.centerLeft,
-                child: IconButton(
-                  onPressed: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) {
-                          return MyApp();
-                        }));
-                  },
-                  padding: EdgeInsets.symmetric(vertical: 5.0),
-                  icon: Icon(Icons.arrow_back_ios),
-                  color: Colors.white,
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 5.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: <Widget>[
-                    Text(
-                      'Add Property ',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                          fontSize: 25.0,
-                          fontFamily: 'Raleway'),
+    return Stack(
+      children: <Widget>[
+        Scaffold(
+          backgroundColor: Color(0xFF607D8B),
+          body: ListView(children: <Widget>[
+            Padding(
+                padding: EdgeInsets.symmetric(vertical: 20.0),
+                child: Column(children: <Widget>[
+                  Container(
+                    alignment: Alignment.centerLeft,
+                    child: IconButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      padding: EdgeInsets.symmetric(vertical: 5.0),
+                      icon: Icon(Icons.arrow_back_ios),
+                      color: Colors.white,
                     ),
-                    Text(
-                      'Your Information should be correct',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 10.0,
-                          fontFamily: 'Raleway'),
-                    ),
-                  ],
-                ),
-              ),
-              Column(crossAxisAlignment: CrossAxisAlignment.start, children: <
-                  Widget>[
-                Padding(
-                    padding: EdgeInsets.only(
-                      left: 30.0,
-                      right: 30.0,
-                      top: 25.0,
-                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 5.0),
                     child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Text(
-                            'Name Property',
-                            style: TextStyle(
-                              fontFamily: 'Raleway',
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: <Widget>[
+                        Text(
+                          'Add Property ',
+                          style: TextStyle(
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
-                            ),
-                          ),
-                          Container(
-                            alignment: Alignment.centerLeft,
-                            height: 60.0,
-                            child: TextFormField(
-                              keyboardType: TextInputType.text,
-                              controller: _nameController,
-                              style: TextStyle(
-                                color: Colors.white,
-                              ),
-                              decoration: InputDecoration(
-                                contentPadding: EdgeInsets.only(top: 14.0),
-                                hintText: 'please write title for your property',
-                                hintStyle: TextStyle(
-                                  color: Colors.white30,
+                              fontSize: 25.0,
+                              fontFamily: 'Raleway'),
+                        ),
+                        Text(
+                          'Your Information should be correct',
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 10.0,
+                              fontFamily: 'Raleway'),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Column(crossAxisAlignment: CrossAxisAlignment.start, children: <
+                      Widget>[
+                    Padding(
+                        padding: EdgeInsets.only(
+                          left: 30.0,
+                          right: 30.0,
+                          top: 25.0,
+                        ),
+                        child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Text(
+                                'Name Property',
+                                style: TextStyle(
+                                  fontFamily: 'Raleway',
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
                                 ),
                               ),
-                            ),
-                          ),
-                          SizedBox(
-                            height: 10.0,
-                          ),
-                          Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                Text(
-                                  'Address ',
+                              // Name Controller Used
+                              Container(
+                                alignment: Alignment.centerLeft,
+                                height: 60.0,
+                                child: TextFormField(
+                                  keyboardType: TextInputType.text,
+                                  controller: _nameController,
                                   style: TextStyle(
-                                    fontFamily: 'Raleway',
                                     color: Colors.white,
-                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  decoration: InputDecoration(
+                                    contentPadding: EdgeInsets.only(top: 14.0),
+                                    hintText:
+                                        'please write title for your property',
+                                    hintStyle: TextStyle(
+                                      color: Colors.white30,
+                                    ),
                                   ),
                                 ),
-                                Container(
-                                  alignment: Alignment.centerLeft,
-                                  height: 60.0,
-                                  child: TextFormField(
-                                    keyboardType: TextInputType.text,
-                                    controller: _addressController,
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                    ),
-                                    decoration: InputDecoration(
-                                      contentPadding: EdgeInsets.only(top: 14.0),
-                                      hintText: 'Add address of property',
-                                      hintStyle: TextStyle(
-                                        color: Colors.white30,
+                              ),
+                              SizedBox(
+                                height: 10.0,
+                              ),
+
+                              Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: <Widget>[
+                                    Text(
+                                      'Address',
+                                      style: TextStyle(
+                                        fontFamily: 'Raleway',
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
                                       ),
                                     ),
-                                  ),
-                                ),
-                                SizedBox(
-                                  height: 10.0,
-                                ),
-                                Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: <Widget>[
-                                      Text(
-                                        'Rent Date',
+                                    Container(
+                                      alignment: Alignment.centerLeft,
+                                      height: 60.0,
+                                      child: TextFormField(
+
+                                        controller: _address,
                                         style: TextStyle(
-                                          fontFamily: 'Raleway',
                                           color: Colors.white,
-                                          fontWeight: FontWeight.bold,
                                         ),
-                                      ),
-                                      Container(
-                                        alignment: Alignment.centerLeft,
-                                        height: 60.0,
-                                        child: TextFormField(
-                                          keyboardType: TextInputType.datetime,
-                                          controller: _dateController,
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                          ),
-                                          decoration: InputDecoration(
-                                            contentPadding:
-                                            EdgeInsets.only(top: 14.0),
-                                            hintText: 'Add address of property',
-                                            hintStyle: TextStyle(
-                                              color: Colors.white30,
-                                            ),
+                                        decoration: InputDecoration(
+                                          contentPadding:
+                                          EdgeInsets.only(top: 14.0),
+                                          hintText:
+                                          'Add addrees of property',
+                                          hintStyle: TextStyle(
+                                            color: Colors.white30,
                                           ),
                                         ),
                                       ),
-                                      SizedBox(
-                                        height: 10.0,
+                                    ),
+                                    SizedBox(
+                                      height: 10.0,
+                                    ),
+                                    // Price controller
+                                    Text(
+                                      'Price',
+                                      style: TextStyle(
+                                        fontFamily: 'Raleway',
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
                                       ),
-                                      Column(
+                                    ),
+                                    Container(
+                                      alignment: Alignment.centerLeft,
+                                      height: 60.0,
+                                      child: TextFormField(
+                                        keyboardType: TextInputType.number,
+                                        controller: priceController,
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                        ),
+                                        decoration: InputDecoration(
+                                          contentPadding:
+                                              EdgeInsets.only(top: 14.0),
+                                          hintText:
+                                              'Add price of property per month',
+                                          hintStyle: TextStyle(
+                                            color: Colors.white30,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: 10.0,
+                                    ),
+                                    Column(
                                         crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                            CrossAxisAlignment.start,
                                         children: <Widget>[
                                           Text(
-                                            'Property Specification ',
+                                            'View of Appartment',
                                             style: TextStyle(
                                               fontFamily: 'Raleway',
-                                              fontWeight: FontWeight.bold,
                                               color: Colors.white,
+                                              fontWeight: FontWeight.bold,
                                             ),
                                           ),
                                           Container(
                                             alignment: Alignment.centerLeft,
                                             height: 60.0,
-                                            child: TextField(
-                                              keyboardType: TextInputType.number,
+                                            child: TextFormField(
+                                              keyboardType: TextInputType.text,
+                                              controller: _viewController,
                                               style: TextStyle(
                                                 color: Colors.white,
                                               ),
                                               decoration: InputDecoration(
                                                 contentPadding:
-                                                EdgeInsets.only(top: 14.0),
-                                                hintText: 'Size',
+                                                    EdgeInsets.only(top: 14.0),
+                                                hintText:
+                                                    'Add view of property like city view',
                                                 hintStyle: TextStyle(
                                                   color: Colors.white30,
                                                 ),
                                               ),
                                             ),
                                           ),
-                                          Container(
-                                            alignment: Alignment.centerLeft,
-                                            height: 60.0,
-                                            child: TextField(
-                                              keyboardType: TextInputType.number,
-                                              style: TextStyle(
-                                                color: Colors.white,
-                                              ),
-                                              decoration: InputDecoration(
-                                                contentPadding:
-                                                EdgeInsets.only(top: 14.0),
-                                                hintText: 'Total Beedrooms',
-                                                hintStyle: TextStyle(
-                                                  color: Colors.white30,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          Container(
-                                            alignment: Alignment.centerLeft,
-                                            height: 60.0,
-                                            child: TextField(
-                                              keyboardType: TextInputType.number,
-                                              style: TextStyle(
-                                                color: Colors.white,
-                                              ),
-                                              decoration: InputDecoration(
-                                                contentPadding:
-                                                EdgeInsets.only(top: 14.0),
-                                                hintText: 'No.Of Bathrooms ',
-                                                hintStyle: TextStyle(
-                                                  color: Colors.white30,
-                                                ),
-                                              ),
-                                            ),
+                                          SizedBox(
+                                            height: 10.0,
                                           ),
                                           Column(
                                             crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                                CrossAxisAlignment.start,
                                             children: <Widget>[
                                               Text(
-                                                'More Describe',
+                                                'Property Specification ',
                                                 style: TextStyle(
                                                   fontFamily: 'Raleway',
                                                   fontWeight: FontWeight.bold,
@@ -293,99 +281,217 @@ class _PropertyAdvState extends State<PropertyAdv> {
                                                 height: 60.0,
                                                 child: TextField(
                                                   keyboardType:
-                                                  TextInputType.text,
+                                                      TextInputType.number,
                                                   style: TextStyle(
                                                     color: Colors.white,
                                                   ),
+                                                  controller: _size,
                                                   decoration: InputDecoration(
                                                     contentPadding:
-                                                    EdgeInsets.only(
-                                                        top: 14.0),
-                                                    hintText:
-                                                    'Write more describe',
+                                                        EdgeInsets.only(top: 14.0),
+                                                    hintText: 'Size',
                                                     hintStyle: TextStyle(
                                                       color: Colors.white30,
                                                     ),
                                                   ),
                                                 ),
                                               ),
-
-
-                                              SizedBox(
-                                                height: 10.0,
+                                              Container(
+                                                alignment: Alignment.centerLeft,
+                                                height: 60.0,
+                                                child: TextField(
+                                                  keyboardType:
+                                                      TextInputType.number,
+                                                  controller: _numberOfBedroom,
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                  ),
+                                                  decoration: InputDecoration(
+                                                    contentPadding:
+                                                        EdgeInsets.only(top: 14.0),
+                                                    hintText: 'Total Beedrooms',
+                                                    hintStyle: TextStyle(
+                                                      color: Colors.white30,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              Container(
+                                                alignment: Alignment.centerLeft,
+                                                height: 60.0,
+                                                child: TextField(
+                                                  keyboardType:
+                                                      TextInputType.number,
+                                                  controller: _numberOfBathRooms,
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                  ),
+                                                  decoration: InputDecoration(
+                                                    contentPadding:
+                                                        EdgeInsets.only(top: 14.0),
+                                                    hintText: 'No.Of Bathrooms ',
+                                                    hintStyle: TextStyle(
+                                                      color: Colors.white30,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              Container(
+                                                alignment: Alignment.centerLeft,
+                                                height: 60.0,
+                                                child: TextField(
+                                                  controller: _specialrooms,
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                  ),
+                                                  decoration: InputDecoration(
+                                                    contentPadding:
+                                                        EdgeInsets.only(top: 14.0),
+                                                    hintText:
+                                                        'Special rooms like laundary rooms',
+                                                    hintStyle: TextStyle(
+                                                      color: Colors.white30,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              Container(
+                                                alignment: Alignment.centerLeft,
+                                                height: 60.0,
+                                                child: TextField(
+                                                  controller: _garagerooms,
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                  ),
+                                                  decoration: InputDecoration(
+                                                    contentPadding:
+                                                        EdgeInsets.only(top: 14.0),
+                                                    hintText:
+                                                        'Special Facility Like garages',
+                                                    hintStyle: TextStyle(
+                                                      color: Colors.white30,
+                                                    ),
+                                                  ),
+                                                ),
                                               ),
                                               Column(
                                                 crossAxisAlignment:
-                                                CrossAxisAlignment.start,
+                                                    CrossAxisAlignment.start,
                                                 children: <Widget>[
                                                   Text(
-                                                    ' images',
+                                                    'More Describe',
                                                     style: TextStyle(
                                                       fontFamily: 'Raleway',
                                                       fontWeight: FontWeight.bold,
                                                       color: Colors.white,
                                                     ),
                                                   ),
-                                                  SizedBox(height: 10.0,),
-                                                  buildGridView(),
-                                                ],
-                                              ),
-                                              SizedBox(
-                                                height: 10.0,
-                                              ),
-                                              Row(
-                                                mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                                children: <Widget>[
-                                                  FlatButton(
-                                                    padding: EdgeInsets.symmetric(
-                                                        horizontal: 100.0,
-                                                        vertical: 20.0),
-                                                    shape: RoundedRectangleBorder(
-                                                        borderRadius:
-                                                        BorderRadius.circular(15.0),
-                                                        side: BorderSide(
-                                                          color: Colors.white30,
-                                                        )),
-                                                    color: Colors.blue,
-                                                    child: Text(
-                                                      'Add Property',
+                                                  Container(
+                                                    alignment: Alignment.centerLeft,
+                                                    height: 60.0,
+                                                    child: TextField(
+                                                      keyboardType:
+                                                          TextInputType.text,
+                                                      controller: _description,
                                                       style: TextStyle(
                                                         color: Colors.white,
-                                                        fontFamily: 'Raleway',
-                                                        fontSize: 20.0,
-                                                        fontWeight: FontWeight.bold,
+                                                      ),
+                                                      decoration: InputDecoration(
+                                                        contentPadding:
+                                                            EdgeInsets.only(
+                                                                top: 14.0),
+                                                        hintText:
+                                                            'Write more describe',
+                                                        hintStyle: TextStyle(
+                                                          color: Colors.white30,
+                                                        ),
                                                       ),
                                                     ),
-                                                    onPressed: () {
-                                                      var route = new MaterialPageRoute(
-                                                        builder:
-                                                            (BuildContext context) =>
-                                                        new ListProperty(
-                                                            value: User(
-                                                              name: _nameController.text,
-                                                              address:
-                                                              _addressController.text,
-                                                              date: _dateController.text,
-                                                            )),
-                                                      );
-                                                      Navigator.of(context).push(route);
-                                                    },
-                                                  )
+                                                  ),
+                                                  SizedBox(
+                                                    height: 10.0,
+                                                  ),
+                                                  Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment.start,
+                                                    children: <Widget>[
+                                                      Text(
+                                                        ' images',
+                                                        style: TextStyle(
+                                                          fontFamily: 'Raleway',
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color: Colors.white,
+                                                        ),
+                                                      ),
+                                                      SizedBox(
+                                                        height: 10.0,
+                                                      ),
+                                                      buildGridView(),
+                                                    ],
+                                                  ),
+                                                  SizedBox(
+                                                    height: 10.0,
+                                                  ),
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.center,
+                                                    mainAxisSize: MainAxisSize.min,
+                                                    children: <Widget>[
+                                                      FlatButton(
+                                                        padding:
+                                                            EdgeInsets.symmetric(
+                                                                horizontal: 80.0,
+                                                                vertical: 20.0),
+                                                        shape:
+                                                            RoundedRectangleBorder(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            15.0),
+                                                                side: BorderSide(
+                                                                  color: Colors
+                                                                      .white30,
+                                                                )),
+                                                        color: Colors.blue,
+                                                        child: Text(
+                                                          'Add Property',
+                                                          style: TextStyle(
+                                                            color: Colors.white,
+                                                            fontFamily: 'Raleway',
+                                                            fontSize: 20.0,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                          ),
+                                                        ),
+                                                        onPressed: () async {
+
+
+
+                                                          setState(() {
+                                                            isUploading = true;
+                                                          });
+                                                          uploadMultipleFiles();
+
+                                                          //  Navigator.of(context).push(route);
+                                                        },
+                                                      )
+                                                    ],
+                                                  ),
                                                 ],
                                               ),
                                             ],
                                           ),
-                                        ],
-                                      ),
-                                    ]),
-                              ]),
-                        ] )
-                )])
-            ]))
-      ]),
+                                        ]),
+                                  ]),
+                            ]))
+                  ])
+                ]))
+          ]),
+        ),
+        buildLoading()
+      ],
     );
-
   }
 
   Widget buildGridView() {
@@ -417,6 +523,7 @@ class _PropertyAdvState extends State<PropertyAdv> {
                     onTap: () {
                       setState(() {
                         images.replaceRange(index, index + 1, ['Add Image']);
+                        _listOFImages.removeLast();
                       });
                     },
                   ),
@@ -439,28 +546,108 @@ class _PropertyAdvState extends State<PropertyAdv> {
   }
 
   Future _onAddImageClick(int index) async {
-    setState(() {
-      _imageFile = ImagePicker.pickImage(source: ImageSource.gallery);
-      getFileImage(index);
-    });
+    _imageFile = await ImagePicker.pickImage(source: ImageSource.gallery);
+    if (_imageFile != null) {
+      _listOFImages.add(_imageFile);
+    }
+    ImageUploadModel imageUpload = new ImageUploadModel();
+    imageUpload.isUploaded = false;
+    imageUpload.uploading = false;
+    imageUpload.imageFile = _imageFile;
+    imageUpload.imageUrl = '';
+    images.replaceRange(index, index + 1, [imageUpload]);
+    //getFileImage(index);
+    setState(() {});
   }
 
-  void getFileImage(int index) async {
-//    var dir = await path_provider.getTemporaryDirectory();
+//  void getFileImage(int index) async {
+////    var dir = await path_provider.getTemporaryDirectory();
+//
+//    _imageFile.then((file) async {
+//      setState(() {
+//        ImageUploadModel imageUpload = new ImageUploadModel();
+//        imageUpload.isUploaded = false;
+//        imageUpload.uploading = false;
+//        imageUpload.imageFile = file;
+//        imageUpload.imageUrl = '';
+//        images.replaceRange(index, index + 1, [imageUpload]);
+//      });
+//    });
+//  }
 
-    _imageFile.then((file) async {
-      setState(() {
-        ImageUploadModel imageUpload = new ImageUploadModel();
-        imageUpload.isUploaded = false;
-        imageUpload.uploading = false;
-        imageUpload.imageFile = file;
-        imageUpload.imageUrl = '';
-        images.replaceRange(index, index + 1, [imageUpload]);
+  void uploadMultipleFiles() {
+    print(_imageFile);
+    print(_listOFImages);
+    if (_listOFImages.length == 0) {
+      Fluttertoast.showToast(
+          msg: 'Please atleast add one immage', gravity: ToastGravity.CENTER);
+    }
+    //print('fbfdd');
+    else {
+      _listOFImages.forEach((file) {
+        // Uploading single file
+        uploadFile(file);
       });
+      print(_listOFImagesUrl);
+    }
+    //return _listOFImagesUrl;
+    //Firestore.instance.collection('Appartments');
+  }
+
+  Future uploadFile(File file) async {
+    String fileName = DateTime.now().millisecondsSinceEpoch.toString();
+    StorageReference reference = FirebaseStorage.instance.ref().child(fileName);
+    StorageUploadTask uploadTask = reference.putFile(file);
+    StorageTaskSnapshot storageTaskSnapshot = await uploadTask.onComplete;
+    storageTaskSnapshot.ref.getDownloadURL().then((downloadUrl) {
+      //imageUrl = downloadUrl;
+      _listOFImagesUrl.add(downloadUrl);
+      if (_listOFImagesUrl.length == _listOFImages.length) {
+        print(_listOFImagesUrl);
+        Firestore.instance
+            .collection('Appartment')
+            .document(
+                '${fatehPreferences.getString('myUID')}-${DateTime.now().millisecondsSinceEpoch.toString()}')
+            .setData({
+          AppartmentByFateh.bedrooms : _numberOfBedroom.text,
+          AppartmentByFateh.bathrooms : _numberOfBathRooms.text,
+          AppartmentByFateh.propertyName : _nameController.text,
+          AppartmentByFateh.price: priceController.text,
+          AppartmentByFateh.viewside: _viewController.text,
+          AppartmentByFateh.size: _size.text,
+          AppartmentByFateh.specialRooms: _specialrooms.text,
+          AppartmentByFateh.garageRooms: _garagerooms.text,
+          AppartmentByFateh.description: _description.text,
+          AppartmentByFateh.address: _address.text,
+          AppartmentByFateh.url : _listOFImagesUrl,
+          AppartmentByFateh.ownerUID : fatehPreferences.getString('myUID'),
+          AppartmentByFateh.ownenerName : fatehPreferences.getString('nickname')
+            }
+          );
+        setState(() {
+          isUploading = false;
+        });
+      }
+    }, onError: (err) {
+      Fluttertoast.showToast(msg: 'Error while uploading');
     });
   }
 }
-
+class AppartmentByFateh{
+  static const  String bedrooms = 'beedrooms';
+  static const  String bathrooms = 'bathdrooms';
+  static const  String propertyName = 'propertyName';
+  static const  String price = 'price';
+  static const  String viewside = 'viewside';
+  static const  String size = 'size';
+  static const  String specialRooms = 'specialRooms';
+  static const  String  garageRooms = 'garageRooms';
+  static const  String description = 'description';
+  static const  String address = 'address';
+  static const String url = 'url';
+  static const String ownerUID = 'uid';
+  static const String ownenerName = 'ownerName';
+}
 class ImageUploadModel {
   bool isUploaded;
   bool uploading;

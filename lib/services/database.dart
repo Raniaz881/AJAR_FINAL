@@ -12,9 +12,12 @@ class DatabaseService {
     return await userCollection.document(uid).setData({
       'email': email,
       'pass': pass,
-      'firstName': firstName,
+      'nickname': firstName,
       'lastName': lastName,
       'phoneNumber': phoneNumber,
+      'createdAt': DateTime.now().millisecondsSinceEpoch.toString(),
+      'id': uid,
+      'chattingWith': '',
     });
   }
 

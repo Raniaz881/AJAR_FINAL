@@ -1,19 +1,43 @@
 import 'package:carousel_pro/carousel_pro.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_app/AddProperty/addProperty.dart';
+import 'package:flutter_app/Fateh/sendPropasal.dart';
 import 'package:flutter_app/HomePage/apartment.dart';
+import 'package:flutter_app/main.dart';
 import 'package:flutter_app/request_property.dart';
-
+import 'package:fluttertoast/fluttertoast.dart';
 
 class ApartmentScreen extends StatefulWidget {
-  final Apartment apartment;
+  //final Apartment apartment;
+  final DocumentSnapshot documents;
 
-  ApartmentScreen({this.apartment});
+  const ApartmentScreen({Key key, this.documents}) : super(key: key);
+
+  //ApartmentScreen({this.apartment});
 
   @override
   _ApartmentScreenState createState() => _ApartmentScreenState();
 }
 
 class _ApartmentScreenState extends State<ApartmentScreen> {
+  List<NetworkImage> _listOfImages = <NetworkImage>[];
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _listOfImages = [];
+    for (int i = 0;
+        i < widget.documents.data[AppartmentByFateh.url].length;
+        i++) {
+      print(widget.documents.data[AppartmentByFateh.url].length);
+      debugPrint(widget.documents.data[AppartmentByFateh.url][i]);
+      _listOfImages
+          .add(NetworkImage(widget.documents.data[AppartmentByFateh.url][i]));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -45,11 +69,7 @@ class _ApartmentScreenState extends State<ApartmentScreen> {
                       borderRadius: BorderRadius.circular(20.0),
                       child: Carousel(
                           boxFit: BoxFit.cover,
-                          images: [
-                            AssetImage('assets/images/1.jpg'),
-                            AssetImage('assets/images/1a.jpg'),
-                            AssetImage('assets/images/1b.jpg'),
-                          ],
+                          images: _listOfImages,
                           autoplay: false,
                           dotBgColor: Colors.white.withOpacity(0.5),
                           animationCurve: Curves.fastOutSlowIn,
@@ -58,7 +78,6 @@ class _ApartmentScreenState extends State<ApartmentScreen> {
                   ),
                 ),
               ),
-
               Positioned(
                 top: MediaQuery.of(context).size.height / 2,
                 child: Container(
@@ -83,22 +102,17 @@ class _ApartmentScreenState extends State<ApartmentScreen> {
                 top: 98,
                 bottom: 0,
                 right: 25,
-
                 child: Container(
-
-
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: Colors.white,
-
                   ),
                   child: IconButton(
                     icon: Icon(Icons.favorite_border),
                     color: Colors.red,
                     iconSize: 40,
-                    onPressed: (){},
+                    onPressed: () {},
                   ),
-
                 ),
               ),
               Padding(
@@ -123,7 +137,8 @@ class _ApartmentScreenState extends State<ApartmentScreen> {
                   child: ListView(
                     children: [
                       Text(
-                        '500 JDs',
+                        widget.documents.data[AppartmentByFateh.price]
+                            .toString(),
                         style: TextStyle(
                             fontFamily: 'nunito',
                             fontSize: 20.0,
@@ -165,33 +180,39 @@ class _ApartmentScreenState extends State<ApartmentScreen> {
                               scrollDirection: Axis.horizontal,
                               children: [
                                 buildIngredientItem(
-                                  '4 Bedrooms',
+                                  '${widget.documents.data[AppartmentByFateh.bedrooms].toString()} Bedrooms',
                                   Icon(Icons.hotel,
                                       size: 20.0, color: Colors.white),
                                   Color(0xFF6FC5DA),
                                 ),
                                 buildIngredientItem(
-                                    '240 m²',
+                                    '${widget.documents.data[AppartmentByFateh.size].toString()} m²',
                                     Icon(Icons.home,
                                         size: 20.0, color: Colors.white),
                                     Color(0xFF615955)),
                                 buildIngredientItem(
-                                    'City view',
+                                    widget.documents
+                                        .data[AppartmentByFateh.viewside]
+                                        .toString(),
                                     Icon(Icons.location_city,
                                         size: 20.0, color: Colors.white),
                                     Color(0xFFF39595)),
                                 buildIngredientItem(
-                                    'Laundry room',
+                                    widget.documents
+                                        .data[AppartmentByFateh.specialRooms]
+                                        .toString(),
                                     Icon(Icons.local_laundry_service,
                                         size: 20.0, color: Colors.white),
                                     Color(0xFF8FC28A)),
                                 buildIngredientItem(
-                                    '3 Bathrooms',
+                                    '${widget.documents.data[AppartmentByFateh.bathrooms].toString()} Bathrooms',
                                     Icon(Icons.wc,
                                         size: 20.0, color: Colors.white),
                                     Color(0xFF3B8079)),
                                 buildIngredientItem(
-                                    'Personal garage',
+                                    widget.documents
+                                        .data[AppartmentByFateh.garageRooms]
+                                        .toString(),
                                     Icon(Icons.directions_car,
                                         size: 20.0, color: Colors.white),
                                     Color(0xFFF8B870)),
@@ -208,7 +229,8 @@ class _ApartmentScreenState extends State<ApartmentScreen> {
                         width: 10.0,
                       ),
                       Text(
-                        'Furnished apartment located in Amman.Located 2.6 km from US Embassy',
+                        widget.documents.data[AppartmentByFateh.description]
+                            .toString(),
                         style: TextStyle(
                             fontFamily: 'nunito',
                             fontSize: 14.0,
@@ -224,30 +246,106 @@ class _ApartmentScreenState extends State<ApartmentScreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
                           FlatButton(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 50.0, vertical: 10.0),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(15.0),
-                                side: BorderSide(
-                                  color: Colors.white30,
-                                )),
-                            color: Colors.blue,
-                            child: Text(
-                              'Request Property',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontFamily: 'Raleway',
-                                fontSize: 20.0,
-                                fontWeight: FontWeight.bold,
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 50.0, vertical: 10.0),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(15.0),
+                                  side: BorderSide(
+                                    color: Colors.white30,
+                                  )),
+                              color: Colors.blue,
+                              child: Text(
+                                'Request Property',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontFamily: 'Raleway',
+                                  fontSize: 20.0,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            ),
-                            onPressed: () {
-                              var route = new MaterialPageRoute(
-                                  builder: (BuildContext context) =>
-                                      RequestForm());
-                              Navigator.of(context).push(route);
-                            },
-                          )
+                              onPressed: () {
+                                if (widget.documents
+                                    .data[AppartmentByFateh.ownerUID] ==
+                                    fatehPreferences
+                                        .getString('myUID')) {
+                                  showDialog(context: context, builder: (_) {
+                                    return AlertDialog(
+                                      content: Text(
+                                          'This property is owned by you'),
+                                      actions: <Widget>[
+                                        RaisedButton(onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+                                            child: Text('OK')
+                                        )
+                                      ],
+                                    );
+                                  });
+                                }
+                                else {
+                                  final DocumentReference documentReference =
+                                  Firestore.instance.document(
+                                      "users/${fatehPreferences.getString(
+                                          'myUID')}/$collectionFriends/${widget
+                                          .documents
+                                          .data[AppartmentByFateh.ownerUID]}");
+
+                                  documentReference
+                                      .snapshots()
+                                      .listen((datasnapshot) {
+                                    //FINDING A SPECIFICDOCUMENT IS EXISTING INSIDE A COLLECTION
+
+                                    if (datasnapshot.exists) {
+                                      setState(() {
+                                        showDialog(
+                                            context: context,
+                                            builder: (_) {
+                                              return AlertDialog(
+                                                content: Text(
+                                                    'You are already friends, Please talk with him in chat section'),
+                                              );
+                                            });
+
+                                        ///   myText1 = "Document exist";
+                                      });
+                                    } else if (!datasnapshot.exists) {
+                                      setState(() {
+                                        // myText2 = "Document not exist";
+                                        Firestore.instance
+                                            .collection('users')
+                                            .document(widget.documents
+                                            .data[AppartmentByFateh.ownerUID])
+                                            .collection(collectionRequests)
+                                            .document(fatehPreferences
+                                            .getString('myUID'))
+                                            .setData({
+                                          'requestByID':
+                                          fatehPreferences.getString('myUID'),
+                                          'requestToID': widget.documents
+                                              .data[AppartmentByFateh.ownerUID],
+                                          'requestByIDName': fatehPreferences
+                                              .getString('nickname'),
+                                          'requestToIDName':
+                                          widget.documents.data[
+                                          AppartmentByFateh.ownenerName],
+                                          'time': DateTime
+                                              .now()
+                                              .millisecondsSinceEpoch
+                                        }).then((_) {
+                                          Fluttertoast.showToast(
+                                              msg: 'Request Sent');
+                                        });
+                                      });
+                                    }
+                                  });
+                                }
+                              }
+//                              var route = new MaterialPageRoute(
+//                                  builder: (BuildContext context) =>
+//                                      RequestForm());
+//                              Navigator.of(context).push(route);
+//                            },
+                              )
                         ],
                       ),
                     ],

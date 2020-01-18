@@ -1,11 +1,20 @@
 
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/AddProperty/addProperty.dart';
 import 'package:flutter_app/Chat/ChatPage.dart';
 import 'package:flutter_app/Contract/contract_template_screen.dart';
+import 'package:flutter_app/Fateh/combined.dart';
 import 'package:flutter_app/HomePage/apartment_carousel.dart';
 import 'package:flutter_app/HomePage/office_carousel.dart';
+import 'package:flutter_app/main.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import '../Payment/MyCardPage.dart';
 import 'package:flutter_app/ListOfrequests.dart';
 
@@ -18,9 +27,71 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
 
+  final FirebaseMessaging firebaseMessaging = new FirebaseMessaging();
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = new FlutterLocalNotificationsPlugin();
+  @override
+  void initState() {
+    super.initState();
+    registerNotification();
+    configLocalNotification();
+  }
 
+  void registerNotification() {
+    firebaseMessaging.requestNotificationPermissions();
+
+    firebaseMessaging.configure(onMessage: (Map<String, dynamic> message) {
+      print('onMessage: $message');
+      showNotification(message['notification']);
+      return;
+    }, onResume: (Map<String, dynamic> message) {
+      print('onResume: $message');
+      return;
+    }, onLaunch: (Map<String, dynamic> message) {
+      print('onLaunch: $message');
+      return;
+    });
+
+    firebaseMessaging.getToken().then((token) {
+      print('token: $token');
+      Firestore.instance.collection('users').document(fatehPreferences.getString('myUID')).updateData({'pushToken': token});
+    }).catchError((err) {
+      Fluttertoast.showToast(msg: err.message.toString());
+    });
+  }
+
+  void configLocalNotification() {
+    var initializationSettingsAndroid = new AndroidInitializationSettings(
+        'app_icon');
+    var initializationSettingsIOS = new IOSInitializationSettings();
+    var initializationSettings = new InitializationSettings(
+        initializationSettingsAndroid, initializationSettingsIOS);
+    flutterLocalNotificationsPlugin.initialize(initializationSettings);
+  }
+
+  void showNotification(message) async {
+    var androidPlatformChannelSpecifics = new AndroidNotificationDetails(
+      Platform.isAndroid
+          ? 'com.example.flutter_app'
+          : 'com.duytq.flutterchatdemo',
+      'Flutter chat demo',
+      'your channel description',
+      playSound: true,
+      enableVibration: true,
+      importance: Importance.Max,
+      priority: Priority.High,
+    );
+    var iOSPlatformChannelSpecifics = new IOSNotificationDetails();
+    var platformChannelSpecifics =
+    new NotificationDetails(
+        androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
+    await flutterLocalNotificationsPlugin.show(
+        0, message['title'].toString(), message['body'].toString(),
+        platformChannelSpecifics,
+        payload: json.encode(message));
+  }
+
+  @override
   Widget build(BuildContext context) {
-
 
     return Scaffold(
       appBar: AppBar(
@@ -81,7 +152,8 @@ class _HomeScreenState extends State<HomeScreen> {
             CustomListTile(Icons.person,'Profile',()=>{}),
 
             CustomListTile(Icons.home,'My Properties',()=>{}),
-            CustomListTile(Icons.person_add,'Requests',()=>{Navigator.push(context, MaterialPageRoute(builder: (context)=> Listrequest()))}),
+            CustomListTile(Icons.person_add,'Friends',()=>{
+              Navigator.push(context, MaterialPageRoute(builder: (context)=> SocialScreen()))}),
             CustomListTile(Icons.library_books,'Contracts',()=>{Navigator.push(context, MaterialPageRoute(builder: (context)=> TemplatePage()))}),
             SizedBox(height: 70),
 
@@ -173,7 +245,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             ),
             onPressed: (){
-              Navigator.push(context, MaterialPageRoute(builder:(context) => AddProperty()));
+              Navigator.push(context, MaterialPageRoute(builder:(context) => PropertyAdv()));
             },
           ),
           IconButton(
