@@ -144,6 +144,7 @@ class _SignInState extends State<SignIn> {
                           _showEmailDialog();
                         });
                       } else {
+
                         final QuerySnapshot userresult = await Firestore
                             .instance
                             .collection('users')
