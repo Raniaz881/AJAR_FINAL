@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_app/Chat/chat_screen.dart';
-import 'package:flutter_app/Fateh/sendPropasal.dart';
+import 'package:flutter_app/Friend_function/sendPropasal.dart';
 import 'package:flutter_app/main.dart';
 
 class FriendsScreen extends StatefulWidget {
@@ -26,7 +25,7 @@ class _FriendsScreenState extends State<FriendsScreen> {
     return StreamBuilder<QuerySnapshot>(
       stream: Firestore.instance
           .collection('users')
-          .document(fatehPreferences.getString('myUID'))
+          .document(ajarPreferences.getString('myUID'))
           .collection(collectionFriends)
           //.orderBy("time", descending: true)
           .snapshots(),
@@ -66,7 +65,7 @@ class _FriendsScreenState extends State<FriendsScreen> {
                               child: Text(
                                 data['friendIDName'],
                                 style: TextStyle(
-                                    color: Colors.deepPurple,
+                                    color: Color(0xFF50A0A0),
                                     fontWeight: FontWeight.w500),
                                 maxLines: 6,
                               )),
@@ -93,7 +92,7 @@ class _FriendsScreenState extends State<FriendsScreen> {
                           style: TextStyle(
                               color: Colors.white, fontWeight: FontWeight.bold),
                         ),
-                        color: Colors.deepPurple,
+                        color: Color(0xFF50A0A0),
                       ),
                     ),
                   ],
