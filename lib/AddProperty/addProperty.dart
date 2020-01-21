@@ -3,8 +3,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-
-import 'MyProperties.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_app/main.dart';
 import 'package:flutter/material.dart';
@@ -81,7 +79,7 @@ class _PropertyAdvState extends State<PropertyAdv> {
     return Stack(
       children: <Widget>[
         Scaffold(
-          backgroundColor: Color(0xFF607D8B),
+          backgroundColor: Color(0xFF50A0A0),
           body: ListView(children: <Widget>[
             Padding(
                 padding: EdgeInsets.symmetric(vertical: 20.0),
@@ -607,21 +605,21 @@ class _PropertyAdvState extends State<PropertyAdv> {
         Firestore.instance
             .collection('Appartment')
             .document(
-                '${fatehPreferences.getString('myUID')}-${DateTime.now().millisecondsSinceEpoch.toString()}')
+                '${ajarPreferences.getString('myUID')}-${DateTime.now().millisecondsSinceEpoch.toString()}')
             .setData({
-          AppartmentByFateh.bedrooms : _numberOfBedroom.text,
-          AppartmentByFateh.bathrooms : _numberOfBathRooms.text,
-          AppartmentByFateh.propertyName : _nameController.text,
-          AppartmentByFateh.price: priceController.text,
-          AppartmentByFateh.viewside: _viewController.text,
-          AppartmentByFateh.size: _size.text,
-          AppartmentByFateh.specialRooms: _specialrooms.text,
-          AppartmentByFateh.garageRooms: _garagerooms.text,
-          AppartmentByFateh.description: _description.text,
-          AppartmentByFateh.address: _address.text,
-          AppartmentByFateh.url : _listOFImagesUrl,
-          AppartmentByFateh.ownerUID : fatehPreferences.getString('myUID'),
-          AppartmentByFateh.ownenerName : fatehPreferences.getString('nickname')
+          AppartmentByAjar.bedrooms : _numberOfBedroom.text,
+          AppartmentByAjar.bathrooms : _numberOfBathRooms.text,
+          AppartmentByAjar.propertyName : _nameController.text,
+          AppartmentByAjar.price: priceController.text,
+          AppartmentByAjar.viewside: _viewController.text,
+          AppartmentByAjar.size: _size.text,
+          AppartmentByAjar.specialRooms: _specialrooms.text,
+          AppartmentByAjar.garageRooms: _garagerooms.text,
+          AppartmentByAjar.description: _description.text,
+          AppartmentByAjar.address: _address.text,
+          AppartmentByAjar.url : _listOFImagesUrl,
+          AppartmentByAjar.ownerUID : ajarPreferences.getString('myUID'),
+          AppartmentByAjar.ownenerName : ajarPreferences.getString('nickname')
             }
           );
         setState(() {
@@ -633,7 +631,7 @@ class _PropertyAdvState extends State<PropertyAdv> {
     });
   }
 }
-class AppartmentByFateh{
+class AppartmentByAjar{
   static const  String bedrooms = 'beedrooms';
   static const  String bathrooms = 'bathdrooms';
   static const  String propertyName = 'propertyName';
