@@ -66,7 +66,7 @@ class _SignInState extends State<SignIn> {
             child: Column(
               children: <Widget>[
                 SizedBox(height: 1.0),
-                Center(child: Image.asset('assets/logo.png')),
+                Center(child: Image.asset('assets/images/logo.jpeg.jpeg')),
                 Text(
                   "Login",
                   style: TextStyle(
@@ -77,20 +77,20 @@ class _SignInState extends State<SignIn> {
                 ),
                 SizedBox(height: 30.0),
                 TextFormField(
-                  style: TextStyle(color: Colors.green[800]),
+                  style: TextStyle(color: Color(0xFF50A0A0)),
                   decoration: InputDecoration(
-                      hintStyle: TextStyle(color: Colors.green[800]),
+                      hintStyle: TextStyle(color: Color(0xFF50A0A0)),
                       hintText: "Enter your Email",
                       filled: true,
                       fillColor: Colors.lightGreen[50],
                       enabledBorder: OutlineInputBorder(
                         borderSide:
-                            BorderSide(color: Colors.green[300], width: 3.0),
+                            BorderSide(color: Color(0xFF50A0A0), width: 3.0),
                         borderRadius: new BorderRadius.circular(25.0),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderSide:
-                            BorderSide(color: Colors.green[500], width: 3.0),
+                            BorderSide(color: Color(0xFF50A0A0), width: 3.0),
                         borderRadius: new BorderRadius.circular(25.0),
                       )),
                   validator: (val) {
@@ -102,20 +102,20 @@ class _SignInState extends State<SignIn> {
                 ),
                 SizedBox(height: 20.0),
                 TextFormField(
-                  style: TextStyle(color: Colors.green[800]),
+                  style: TextStyle(color: Color(0xFF50A0A0)),
                   decoration: InputDecoration(
-                      hintStyle: TextStyle(color: Colors.green[800]),
+                      hintStyle: TextStyle(color: Color(0xFF50A0A0)),
                       hintText: "Enter your Password",
                       filled: true,
                       fillColor: Colors.lightGreen[50],
                       enabledBorder: OutlineInputBorder(
                         borderSide:
-                            BorderSide(color: Colors.green[300], width: 3.0),
+                            BorderSide(color: Color(0xFF50A0A0), width: 3.0),
                         borderRadius: new BorderRadius.circular(25.0),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderSide:
-                            BorderSide(color: Colors.green[500], width: 3.0),
+                            BorderSide(color: Color(0xFF50A0A0), width: 3.0),
                         borderRadius: new BorderRadius.circular(25.0),
                       )),
                   obscureText: true,
@@ -125,7 +125,7 @@ class _SignInState extends State<SignIn> {
                 ),
                 SizedBox(height: 20.0),
                 RaisedButton(
-                  color: Colors.green[400],
+                  color: Color(0xFF50A0A0),
                   child: Text(
                     'Login',
                     style: TextStyle(color: Colors.white),
@@ -153,8 +153,8 @@ class _SignInState extends State<SignIn> {
                         final List<DocumentSnapshot> documents =
                             userresult.documents;
 
-                        await fatehPreferences.setString('myUID', result.uid);
-                        await fatehPreferences.setString(
+                        await ajarPreferences.setString('myUID', result.uid);
+                        await ajarPreferences.setString(
                             'nickname', documents[0]['nickname']);
 
                         Navigator.push(
@@ -174,7 +174,7 @@ class _SignInState extends State<SignIn> {
                       style: TextStyle(fontWeight: FontWeight.w500),
                     ),
                     RawMaterialButton(
-                        splashColor: Colors.green,
+                        splashColor: Color(0xFF50A0A0),
                         textStyle: TextStyle(color: Colors.black),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
@@ -183,7 +183,7 @@ class _SignInState extends State<SignIn> {
                               ' Sign Up now  ',
                               style: TextStyle(
                                   fontWeight: FontWeight.w500,
-                                  color: Colors.green),
+                                color: Color(0xFF50A0A0)),
                             ),
                             Icon(Icons.person_add)
                           ],
@@ -204,7 +204,7 @@ class _SignInState extends State<SignIn> {
                       style: TextStyle(fontWeight: FontWeight.w500),
                     ),
                     RawMaterialButton(
-                        splashColor: Colors.green,
+                        splashColor:Color(0xFF50A0A0),
                         textStyle: TextStyle(color: Colors.black),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
@@ -213,7 +213,7 @@ class _SignInState extends State<SignIn> {
                               'Retrieve',
                               style: TextStyle(
                                   fontWeight: FontWeight.w500,
-                                  color: Colors.green),
+                                color: Color(0xFF50A0A0)),
                             ),
                           ],
                         ),
