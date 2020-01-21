@@ -1,25 +1,20 @@
-import 'dart:convert';
+
 import 'dart:io';
 import 'dart:io' as io;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_app/main.dart';
-import 'package:flutter_app/models/message_model.dart';
-import 'package:flutter_app/models/users_model.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_pdf_viewer/flutter_pdf_viewer.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:pdftron_flutter/pdftron_flutter.dart';
 import 'dart:ui';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter_app/Fateh/sendPropasal.dart';
+
 final themeColor = Color(0xfff5a623);
 final primaryColor = Color(0xff203152);
 final greyColor = Color(0xffaeaeae);
@@ -159,7 +154,7 @@ class _ChatScreenState extends State<ChatScreen> {
     } else {
       groupChatId = '$peerId-$id';
     }
-// TODO Uncomment it
+
     Firestore.instance
         .collection('users')
         .document(id)
@@ -178,7 +173,7 @@ class _ChatScreenState extends State<ChatScreen> {
           title: Center(
             child: Text(
               //            widget.user.name,
-              "hbhbhj",
+              "Chat",
               style: TextStyle(
                 fontSize: 28.0,
                 fontWeight: FontWeight.bold,
@@ -544,7 +539,7 @@ class _ChatScreenState extends State<ChatScreen> {
     var dio = new Dio();
     var dir = await getExternalStorageDirectory();
     var knockDir =
-    await new Directory('${dir.path}/AZAR').create(recursive: true);
+    await new Directory('${dir.path}/AJAR').create(recursive: true);
     print("Hello checking the pdf in Externaal Sorage ");
     io.File('${knockDir.path}/$fileName.$extension').exists().then((a) async {
       print(a);
@@ -642,7 +637,7 @@ class _ChatScreenState extends State<ChatScreen> {
           .document(id)
           .collection(id).document("$groupChatId-$temp").setData({
         'contractByID': id,
-        'contractByName': fatehPreferences.getString('nickname'),
+        'contractByName': ajarPreferences.getString('nickname'),
         'contractByAgree': "Accepted",
         'contractToID': peerId,
         'contractToName': peerIDName,
@@ -656,7 +651,7 @@ class _ChatScreenState extends State<ChatScreen> {
           .document(peerId)
           .collection(peerId).document("$groupChatId-$temp").setData({
         'contractByID': id,
-        'contractByName': fatehPreferences.getString('nickname'),
+        'contractByName': ajarPreferences.getString('nickname'),
         'contractByAgree': "Accepted",
         'contractToID': peerId,
         'contractToName': peerIDName,
@@ -738,7 +733,7 @@ class _ChatScreenState extends State<ChatScreen> {
         child: Row(
           children: <Widget>[
             Icon(Icons.add),
-            Text('Make Contract'),
+            Text('Send Contract'),
           ],
         ),
       ),
