@@ -3,7 +3,6 @@ import 'dart:io' as io;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_app/Fateh/sendPropasal.dart';
 import 'package:flutter_app/main.dart';
 import 'package:flutter_pdf_viewer/flutter_pdf_viewer.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -30,8 +29,8 @@ class _ContractScreenState extends State<ContractScreen> {
     return StreamBuilder<QuerySnapshot>(
       stream: Firestore.instance
           .collection('users')
-          .document(fatehPreferences.getString('myUID'))
-          .collection(fatehPreferences.getString('myUID'))
+          .document(ajarPreferences.getString('myUID'))
+          .collection(ajarPreferences.getString('myUID'))
           .orderBy("time", descending: true)
           .snapshots(),
       builder: (context, snapshot) {
@@ -66,33 +65,33 @@ class _ContractScreenState extends State<ContractScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
                           data['contractByName'] ==
-                                  fatehPreferences.getString('nickname')
+                                  ajarPreferences.getString('nickname')
                               ? Container(
                                   alignment: Alignment.centerLeft,
                                   child: Text(
-                                    'you makes an contract to ${data['contractToName']}',
+                                    'you sent a contract to ${data['contractToName']}',
                                     style: TextStyle(
-                                        color: Colors.deepPurple,
+                                        color: Color(0xFF50A0A0),
                                         fontWeight: FontWeight.w500),
                                     maxLines: 6,
                                   ))
                               : Container(
                                   alignment: Alignment.centerLeft,
                                   child: Text(
-                                    '${data['contractByName']} makes an contract',
+                                    '${data['contractByName']} sent a contract',
                                     style: TextStyle(
-                                        color: Colors.deepPurple,
+                                        color: Color(0xFF50A0A0),
                                         fontWeight: FontWeight.w500),
                                     maxLines: 6,
                                   )),
                           data['contractByName'] ==
-                                  fatehPreferences.getString('nickname')
+                                  ajarPreferences.getString('nickname')
                               ? Container(
                                   alignment: Alignment.centerLeft,
                                   child: Text(
                                     'Your Status ${data['contractByAgree']}',
                                     style: TextStyle(
-                                        color: Colors.deepPurple,
+                                        color: Color(0xFF50A0A0),
                                         fontWeight: FontWeight.w500),
                                     maxLines: 6,
                                   ))
@@ -101,18 +100,18 @@ class _ContractScreenState extends State<ContractScreen> {
                                   child: Text(
                                     'Your Status ${data['contractToAgree']}',
                                     style: TextStyle(
-                                        color: Colors.deepPurple,
+                                        color: Color(0xFF50A0A0),
                                         fontWeight: FontWeight.w500),
                                     maxLines: 6,
                                   )),
                           data['contractByName'] !=
-                                  fatehPreferences.getString('nickname')
+                                  ajarPreferences.getString('nickname')
                               ? Container(
                                   alignment: Alignment.centerLeft,
                                   child: Text(
                                     '${data['contractByName']} Status ${data['contractByAgree']}',
                                     style: TextStyle(
-                                        color: Colors.deepPurple,
+                                        color: Color(0xFF50A0A0),
                                         fontWeight: FontWeight.w500),
                                     maxLines: 6,
                                   ))
@@ -121,7 +120,7 @@ class _ContractScreenState extends State<ContractScreen> {
                                   child: Text(
                                     '${data['contractToName']} Status ${data['contractToAgree']}',
                                     style: TextStyle(
-                                        color: Colors.deepPurple,
+                                        color: Color(0xFF50A0A0),
                                         fontWeight: FontWeight.w500),
                                     maxLines: 6,
                                   )),
@@ -139,7 +138,7 @@ class _ContractScreenState extends State<ContractScreen> {
                   child: Text('View Agreement'),
                 ),
 
-                data['contractByID'] == fatehPreferences.getString('myUID') ||
+                data['contractByID'] == ajarPreferences.getString('myUID') ||
                         data['contractToAgree'] == 'Accepted' ||
                         data['contractToAgree'] == 'Rejected'
                     ? Container()
@@ -151,8 +150,8 @@ class _ContractScreenState extends State<ContractScreen> {
                             // Writing data  to own
                             Firestore.instance
                                 .collection('users')
-                                .document(fatehPreferences.getString('myUID'))
-                                .collection(fatehPreferences.getString('myUID'))
+                                .document(ajarPreferences.getString('myUID'))
+                                .collection(ajarPreferences.getString('myUID'))
                                 .document(data.documentID)
                                 .updateData({
                               'contractToAgree': 'Accepted',
@@ -167,7 +166,7 @@ class _ContractScreenState extends State<ContractScreen> {
                               'contractToAgree': 'Accepted',
                             });
                             onSendMessage(
-                                '${fatehPreferences.getString('nickname')} accepted your contract',
+                                '${ajarPreferences.getString('nickname')} accepted your contract',
                                 0,
                                 data['groupID'],
                                 data['contractToID'],
@@ -179,10 +178,10 @@ class _ContractScreenState extends State<ContractScreen> {
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold),
                           ),
-                          color: Colors.deepPurple,
+                          color:Color(0xFF50A0A0),
                         ),
                       ),
-                data['contractByID'] == fatehPreferences.getString('myUID')
+                data['contractByID'] == ajarPreferences.getString('myUID')
                     ||
                     data['contractToAgree'] == 'Accepted' ||
                     data['contractToAgree'] == 'Rejected'
@@ -194,8 +193,8 @@ class _ContractScreenState extends State<ContractScreen> {
                             // Writing data  to own
                             Firestore.instance
                                 .collection('users')
-                                .document(fatehPreferences.getString('myUID'))
-                                .collection(fatehPreferences.getString('myUID'))
+                                .document(ajarPreferences.getString('myUID'))
+                                .collection(ajarPreferences.getString('myUID'))
                                 .document(data.documentID)
                                 .updateData({
                               'contractToAgree': 'Rejected',
@@ -210,7 +209,7 @@ class _ContractScreenState extends State<ContractScreen> {
                               'contractToAgree': 'Rejected',
                             });
                             onSendMessage(
-                                '${fatehPreferences.getString('nickname')} rejected your contract',
+                                '${ajarPreferences.getString('nickname')} rejected your contract',
                                 0,
                                 data['groupID'],
                                 data['contractToID'],
@@ -219,7 +218,7 @@ class _ContractScreenState extends State<ContractScreen> {
                           child: Text(
                             "Reject",
                             style: TextStyle(
-                              color: Colors.deepPurple,
+                              color:Color(0xFF50A0A0),
                               fontWeight: FontWeight.bold,
                             ),
                           ),
