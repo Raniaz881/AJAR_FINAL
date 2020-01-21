@@ -1,13 +1,14 @@
-import 'package:flutter/services.dart';
+
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter_app/Fateh/contracts.dart';
-import 'package:flutter_app/Fateh/friends.dart';
-import 'package:flutter_app/Fateh/requests.dart';
-import 'package:flutter_app/Fateh/sendPropasal.dart';
+import 'package:flutter_app/Friend_function/contracts.dart';
+import 'package:flutter_app/Friend_function/friends.dart';
+import 'package:flutter_app/Friend_function/requests.dart';
+
 
 
 class SocialScreen extends StatefulWidget {
+
+
   @override
   _SocialScreenState createState() => _SocialScreenState();
 }
@@ -19,26 +20,30 @@ class _SocialScreenState extends State<SocialScreen> {
       length: 3,
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.deepPurple,
-          title: Text('Challenge'),
+          backgroundColor: Color(0xFF50A0A0),
+
           bottom:   TabBar(
             tabs: [
-              Tab(icon: Icon(Icons.control_point),text: "Contracts",),
+
             //  Tab(icon: Icon(Icons.person_add),text: "Send Proposal",),
-              Tab(icon: Icon(Icons.person),text: 'Friend',),
-              Tab(icon: Icon(Icons.record_voice_over),text: 'Requests',)
+
+              Tab(icon: Icon(Icons.add_alert),text: 'Requests',),
+              Tab(icon: Icon(Icons.person),text: 'Friends',),
+              Tab(icon: Icon(Icons.library_books),text: "Contracts",),
             ],
-            indicatorColor: Colors.pink,
+            indicatorColor: Colors.grey,
             indicatorWeight: 5.0,
           ),
         ),
 
         body: TabBarView(
           children: <Widget>[
-            ContractScreen(),
+
             //SendProposal(),
-            FriendsScreen(),
+
             RequestScreen(),
+            FriendsScreen(),
+            ContractScreen(),
           ],
         ),
       ),
