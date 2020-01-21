@@ -1,4 +1,5 @@
 
+
 import 'dart:convert';
 import 'dart:io';
 
@@ -9,16 +10,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app/AddProperty/addProperty.dart';
 import 'package:flutter_app/Chat/ChatPage.dart';
 import 'package:flutter_app/Contract/contract_template_screen.dart';
-import 'package:flutter_app/Fateh/combined.dart';
+import 'package:flutter_app/Friend_function/combined.dart';
 import 'package:flutter_app/HomePage/apartment_carousel.dart';
 import 'package:flutter_app/HomePage/office_carousel.dart';
+import 'package:flutter_app/Payment/passcode_screen.dart';
 import 'package:flutter_app/main.dart';
+import 'package:flutter_app/profile.dart';
+import 'package:flutter_app/services/auth.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import '../Payment/MyCardPage.dart';
 import 'package:flutter_app/ListOfrequests.dart';
 
-
+ AuthService _auth = new AuthService();
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -53,7 +57,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     firebaseMessaging.getToken().then((token) {
       print('token: $token');
-      Firestore.instance.collection('users').document(fatehPreferences.getString('myUID')).updateData({'pushToken': token});
+      Firestore.instance.collection('users').document(ajarPreferences.getString('myUID')).updateData({'pushToken': token});
     }).catchError((err) {
       Fluttertoast.showToast(msg: err.message.toString());
     });
@@ -95,7 +99,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color(0xFFEBEDEF),
+        backgroundColor: Color(0xFFFCFBF4),
         elevation: 0,
         actions: <Widget>[
           Padding(
@@ -149,17 +153,34 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             ),
-            CustomListTile(Icons.person,'Profile',()=>{}),
 
-            CustomListTile(Icons.home,'My Properties',()=>{}),
-            CustomListTile(Icons.person_add,'Friends',()=>{
+                      CustomListTile(Icons.person_add,'Requests',()=>{
               Navigator.push(context, MaterialPageRoute(builder: (context)=> SocialScreen()))}),
             CustomListTile(Icons.library_books,'Contracts',()=>{Navigator.push(context, MaterialPageRoute(builder: (context)=> TemplatePage()))}),
-            SizedBox(height: 70),
 
-            CustomListTile(Icons.info,'About Us',()=>{}),
-            CustomListTile(Icons.receipt,'Terms & Conditions',()=>{}),
-            CustomListTile(Icons.lock,'Log Out',()=>{}),
+
+            CustomListTile(       Icons.info,
+                'About Us',
+                    () => {
+                  showAboutDialog(
+                      context: context,
+                      applicationIcon: FlutterLogo(),
+                      applicationName: 'AJAR',
+                      applicationVersion: '0.1',
+                      applicationLegalese:
+                      'Deveoloped By AJAR Team Khattab, Rania, Marah and Jordan ',
+                      children: <Widget>[
+                        Text(
+                            "AJAR application is a platforms that offer properties realestate services offcharge to each individual asking for it.  "),
+                        Text(
+                            "Providing many servies to ensure a complete,safe experiecnce for both Landlords and Tenants  "),
+                        Text(
+                            "Allowing the landlords to monitor their properties and advertising them to an increasing number of audience "),
+                        Text(
+                            "Tenants will be able to rent a property, sign it's contract and pay the owner with a safe and legitmate process all through AJAR "),
+                      ]),
+                }),
+            CustomListTile(Icons.lock,'Log Out',()=>{_auth.signOut()}),
 
           ],
 
@@ -202,14 +223,17 @@ class _HomeScreenState extends State<HomeScreen> {
 
                       decoration: InputDecoration(
                         hintText: ('Search by area...'),
-                        prefixIcon: Icon(Icons.search),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15),
 
+                        prefixIcon:IconButton(
+
+                         icon: Icon(Icons.search),
                        ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(15),
                       ),
 
 
+                  ),
                   ),
                 ],
 
@@ -249,11 +273,14 @@ class _HomeScreenState extends State<HomeScreen> {
             },
           ),
           IconButton(
-            icon: Icon(Icons.payment, size: 30, color: Color(0xFF354241
+            icon: Icon(
+              Icons.payment,
+              size: 30,
+              color: Color(0xFF354241),
             ),
-            ),
-            onPressed: (){
-              Navigator.push(context, MaterialPageRoute(builder:(context) => MyCardsPage()));
+            onPressed: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => PassCodeScreen()));
             },
           ),
 
