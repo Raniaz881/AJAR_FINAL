@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_app/Fateh/sendPropasal.dart';
+import 'package:flutter_app/Friend_function/sendPropasal.dart';
 import 'package:flutter_app/main.dart';
 
 class RequestScreen extends StatefulWidget {
@@ -24,7 +24,7 @@ class _RequestScreenState extends State<RequestScreen> {
     return StreamBuilder<QuerySnapshot>(
       stream: Firestore.instance
           .collection('users')
-          .document(fatehPreferences.getString('myUID'))
+          .document(ajarPreferences.getString('myUID'))
           .collection(collectionRequests)
           .orderBy("time", descending: true)
           .snapshots(),
@@ -67,7 +67,7 @@ class _RequestScreenState extends State<RequestScreen> {
                               child: Text(
                                 data['requestByIDName'],
                                 style: TextStyle(
-                                    color: Colors.deepPurple,
+                                    color:Color(0xFF50A0A0),
                                     fontWeight: FontWeight.w500),
                                 maxLines: 6,
                               )),
@@ -83,7 +83,7 @@ class _RequestScreenState extends State<RequestScreen> {
                           // Writing data to friends
                           Firestore.instance
                               .collection('users')
-                              .document(data['requestByID'])
+                              .document(data['TR'])
                               .collection(collectionFriends)
                               .document(data['requestToID'])
                               .setData({
@@ -115,7 +115,7 @@ class _RequestScreenState extends State<RequestScreen> {
                           style: TextStyle(
                               color: Colors.white, fontWeight: FontWeight.bold),
                         ),
-                        color: Colors.deepPurple,
+                        color: Color(0xFF50A0A0),
                       ),
                     ),
                     Padding(
@@ -132,7 +132,7 @@ class _RequestScreenState extends State<RequestScreen> {
                         child: Text(
                           "Reject",
                           style: TextStyle(
-                            color: Colors.deepPurple,
+                            color: Color(0xFF50A0A0),
                             fontWeight: FontWeight.bold,
                           ),
                         ),
